@@ -83,7 +83,7 @@ func (s *feedService) GetFeedsByCategoryID(userID, categoryID string) (feeds []g
 					break
 				}
 			}
-			if flag == false {
+			if flag == false && priv.Later {
 				feed.Articles = append(feed.Articles, graphql.Article{
 					URL:        priv.URL,
 					Title:      priv.Content.Title,
@@ -150,7 +150,11 @@ func (s *feedService) GetLaterArticles(userID string, page, numPerPage *int) (ar
 		end = len(privateArticles)
 	}
 	for i := start; i < end; i++ {
-		feed, err := s.Service.Public.GetPublicFeedByURL(privateArticles[i].Content.FeedURL)
+		publicFeed, err := s.Service.Public.GetPublicFeedByURL(privateArticles[i].Content.FeedURL)
+		if err != nil {
+			return nil, err
+		}
+		feed, err := s.Service.Feed.GetModel().GetFeedByPublicID(userID, publicFeed.PublicID)
 		if err != nil {
 			return nil, err
 		}
@@ -161,10 +165,11 @@ func (s *feedService) GetLaterArticles(userID string, page, numPerPage *int) (ar
 			Updated:    privateArticles[i].Content.Updated,
 			Content:    privateArticles[i].Content.Content,
 			Summary:    privateArticles[i].Content.Summary,
+			PictureURL: privateArticles[i].Content.PictureURL,
 			Categories: privateArticles[i].Content.Categories,
 			Read:       privateArticles[i].Read,
 			Later:      privateArticles[i].Later,
-			FeedID:     "",
+			FeedID:     feed.ID.Hex(),
 			FeedTitle:  feed.Title,
 		})
 	}

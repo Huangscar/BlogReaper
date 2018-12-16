@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -21,5 +22,5 @@ func main() {
 	log.Printf("Load the config file in %v", *configFile)
 	conf := app.Config{}
 	yaml.Unmarshal(data, &conf)
-	log.Fatal(http.ListenAndServe(":30003", app.App(conf)))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(conf.Server.Port), app.App(conf)))
 }

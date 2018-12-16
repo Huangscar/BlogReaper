@@ -9,6 +9,7 @@ type Article struct {
 	Updated    string   `json:"updated"`
 	Content    string   `json:"content"`
 	Summary    string   `json:"summary"`
+	PictureURL string   `json:"pictureUrl"`
 	Categories []string `json:"categories"`
 	Read       bool     `json:"read"`
 	Later      bool     `json:"later"`

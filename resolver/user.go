@@ -29,7 +29,7 @@ func (r *userResolver) LaterArticles(ctx context.Context, obj *graphql.User, pag
 	if obj == nil {
 		return nil, nil
 	}
-	if (page != nil && numPerPage == nil) || (page == nil && numPerPage != nil) || *page <= 0 || *numPerPage <= 0 {
+	if (page != nil && numPerPage == nil) || (page == nil && numPerPage != nil) || (page != nil && *page <= 0) || (numPerPage != nil && *numPerPage <= 0) {
 		return nil, errors.New("invalid_params")
 	}
 	articles, err := r.Service.Feed.GetLaterArticles(userID, page, numPerPage)

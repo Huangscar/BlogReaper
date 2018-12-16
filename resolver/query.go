@@ -18,12 +18,17 @@ func (r *queryResolver) User(ctx context.Context) (*graphql.User, error) {
 	return &user, nil
 }
 
-func (r *queryResolver) Feeds(ctx context.Context, keyword string) ([]graphql.Feed, error) {
-	if keyword == "" {
-		return nil, errors.New("empty_keyword")
+func (r *queryResolver) Feeds(ctx context.Context, id *string, keyword *string) ([]graphql.Feed, error) {
+	if keyword != nil && id != nil {
+		return nil, errors.New("invalid_params")
 	}
-	feeds, err := r.Service.Public.GetPublicFeedByKeyword(keyword)
-	return feeds, err
+	if keyword != nil {
+		feeds, err := r.Service.Public.GetPublicFeedByKeyword(*keyword)
+		return feeds, err
+	} else {
+		feed, err := r.Service.Public.GetPublicFeedByID(*id)
+		return []graphql.Feed{feed}, err
+	}
 }
 
 func (r *queryResolver) PopularArticles(ctx context.Context, page int, numPerPage int) ([]graphql.Article, error) {

@@ -32,6 +32,7 @@ type PublicArticle struct {
 	Updated    string   `bson:"updated"`
 	Content    string   `bson:"content"`
 	Summary    string   `bson:"summary"`
+	PictureURL string   `bson:"pictureUrl"`
 	Categories []string `bson:"categories"`
 	Read       int64    `bson:"read"`
 }

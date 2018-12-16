@@ -18,8 +18,8 @@ type Query {
     # @returns:
     #   []Feed - 订阅源
     # @errors:
-    #   empty_keyword - 关键词为空
-    feeds(keyword: String!): [Feed!]!
+    #   invalid_params - 参数错误
+    feeds(id:String, keyword: String): [Feed!]!
 
     # popularFeeds
     #
@@ -245,6 +245,7 @@ type Article {
     updated: String!
     content: String!
     summary: String!
+    pictureUrl: String!
     categories: [String!]!
     read: Boolean!
     later: Boolean!
