@@ -1,0 +1,39 @@
+version: "3.1"
+services:
+  db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: reaper
+      MYSQL_USER: reaper
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_root_password
+      - db_password
+    ports:
+      - "3306:3306"
+
+  server:
+    depends_on:
+      - db
+    image: reaper:latest
+    ports:
+      - "30003:30003"
+    environment:
+      MYSQL_DB_HOST: db:3306
+      MYSQL_DB_USER: reaper
+      MYSQL_DB_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+
+secrets:
+  db_password:
+    file: config/db_password.txt
+  db_root_password:
+    file: config/db_root_password.txt
+
+volumes:
+  db_data:

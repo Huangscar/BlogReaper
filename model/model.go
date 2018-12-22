@@ -1,42 +1,27 @@
 package model
 
 import (
-	"errors"
+	"database/sql"
 	"github.com/boltdb/bolt"
-	"time"
+	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Model struct {
-	DB         *bolt.DB
-	BucketName string
+	DB        *sql.DB
+	TableName string
 }
 
 func (m *Model) View(fn func(b *bolt.Bucket) error) error {
-	err := m.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(m.BucketName))
-		if b == nil {
-			return errors.New("bucket_not_found")
-		}
-		return fn(b)
-	})
-	if err != nil && err.Error() == "bucket_not_found" {
-		return m.Update(fn)
-	}
-	return err
+	panic("deprecated method")
 }
 
 func (m *Model) Update(fn func(b *bolt.Bucket) error) error {
-	return m.DB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(m.BucketName))
-		if err != nil {
-			return err
-		}
-		return fn(b)
-	})
+	panic("deprecated method")
 }
 
-func NewModel() (*Model, error) {
-	db, err := bolt.Open("config/BlogReaper.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+func NewModel(conf mysql.Config) (*Model, error) {
+	db, err := sql.Open("mysql", conf.FormatDSN())
 	if err != nil {
 		return nil, err
 	}

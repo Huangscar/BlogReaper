@@ -5,3 +5,9 @@ Violet:
   LoginURL: https://oauth.xmatrix.studio/Verify/Authorize/
 Server:
   Port: 30003
+Database:
+  IP: your_database_ip
+  Port: your_database_port
+  Name: your_database_name
+  Username: your_username
+  Password: your_password

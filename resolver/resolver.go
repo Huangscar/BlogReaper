@@ -16,7 +16,6 @@ var resolver *Resolver
 func DefaultResolver() *Resolver {
 	if resolver == nil {
 		resolver = &Resolver{
-			Service: service.NewService(),
 			Session: nil,
 		}
 	}

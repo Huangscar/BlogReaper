@@ -35,6 +35,44 @@ And run BlogReaper.
 $GOPATH/bin/BlogReaper
 ```
 
+## Docker
+
+### Get
+
+```bash
+$ git clone https://github.com/XMatrixStudio/BlogReaper.git
+```
+
+`cd BlogReaper`, and rename `config.example.yaml` as `config.yaml`.
+
+For configure file, you need to input your Violet application id and key.
+
+### Build
+
+Before build, you must make sure go compile environment
+
+```bash
+$ ./build.sh
+```
+
+### Make images and Run
+
+```bash
+$ docker build -t reaper .
+$ docker run -p 30003:30003 --name blog_reaper -d reaper:latest
+```
+
+### Stack
+
+Start with MySQL
+
+```bash
+$ docker swarm init
+$ docker stack deploy -c docker-compse.yml reaperstack
+```
+
+
+
 ## Development
 
 BlogReaper uses `gqlgen` to generate GraphQL code.

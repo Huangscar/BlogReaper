@@ -189,7 +189,7 @@ func (s *feedService) EditFeed(userID, feedID string, title *string, categoryIDs
 		_, err := s.Service.Category.GetModel().GetCategoryById(userID, categoryID)
 		if err != nil && err.Error() == "not_found" {
 			return false, errors.New("invalid_category")
-		} else {
+		} else if err != nil {
 			return false, err
 		}
 	}

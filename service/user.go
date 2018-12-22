@@ -4,9 +4,11 @@ import (
 	"encoding/xml"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/XMatrixStudio/BlogReaper/graphql"
 	"github.com/XMatrixStudio/BlogReaper/model"
 	"github.com/XMatrixStudio/Violet.SDK.Go"
+	"os"
 )
 
 type UserService interface {
@@ -23,6 +25,11 @@ type userService struct {
 }
 
 func NewUserService(s *Service, m *model.UserModel) UserService {
+	_, err := m.DB.Exec(`CREATE TABLE IF NOT EXISTS ` + m.TableName + ` (json JSON)`)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(2)
+	}
 	return &userService{
 		Model:   m,
 		Service: s,
@@ -53,7 +60,7 @@ func (s *userService) LoginByCode(code string) (userID string, err error) {
 		user, err := s.Model.GetUserByID(res.UserID)
 		if err == nil { // 数据库已存在该用户
 			userID = res.UserID
-			s.Model.SetUserToken(user.VioletID.Hex(), res.Token)
+			s.Model.SetUserToken(user.VioletID, res.Token)
 		} else { // 数据库不存在此用户
 			userID = res.UserID
 			userNew, err := s.Violet.GetUserBaseInfo(res.UserID, res.Token)

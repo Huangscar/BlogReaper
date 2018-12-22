@@ -19,3 +19,5 @@ test/result/*.json
 config/config.yaml
 config/BlogReaper.db
 config/BlogReaper.db.lock
+config/db_password.txt
+config/db_root_password.txt
