@@ -2,8 +2,10 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/XMatrixStudio/BlogReaper/graphql"
 	"github.com/XMatrixStudio/BlogReaper/model"
+	"os"
 )
 
 type CategoryService interface {
@@ -20,6 +22,11 @@ type categoryService struct {
 }
 
 func NewCategoryService(s *Service, m *model.CategoryModel) CategoryService {
+	_, err := m.DB.Exec(`CREATE TABLE IF NOT EXISTS ` + m.TableName + ` (json JSON)`)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(2)
+	}
 	return &categoryService{
 		Model:   m,
 		Service: s,
@@ -36,7 +43,7 @@ func (s *categoryService) AddCategory(userID, name string) (category graphql.Cat
 		return category, err
 	}
 	category = graphql.Category{
-		ID:    c.ID.Hex(),
+		ID:    c.ID,
 		Name:  c.Name,
 		Feeds: nil,
 	}
@@ -49,12 +56,12 @@ func (s *categoryService) GetCategories(userID string) (categories []graphql.Cat
 		return categories, err
 	}
 	for _, c := range cs {
-		feeds, err := s.Service.Feed.GetFeedsByCategoryID(userID, c.ID.Hex())
+		feeds, err := s.Service.Feed.GetFeedsByCategoryID(userID, c.ID)
 		if err != nil && err.Error() == "not_found" {
 			feeds = nil
 		}
 		categories = append(categories, graphql.Category{
-			ID:    c.ID.Hex(),
+			ID:    c.ID,
 			Name:  c.Name,
 			Feeds: feeds,
 		})
@@ -64,10 +71,10 @@ func (s *categoryService) GetCategories(userID string) (categories []graphql.Cat
 
 func (s *categoryService) EditCategory(userID, categoryID, newName string) (success bool, err error) {
 	category, err := s.Model.GetCategoryByName(userID, newName)
-	if err != nil {
+	if err != nil && err.Error() != "not_found" {
 		return false, err
 	}
-	if category.Name != "" && category.ID.Hex() != categoryID {
+	if category.Name != "" && category.ID != categoryID {
 		return false, errors.New("repeat_name")
 	}
 	if category.Name != "" {
@@ -91,8 +98,8 @@ func (s *categoryService) RemoveCategory(userID, categoryID string) (success boo
 	}
 	categoryMap := make(map[string]bool)
 	for _, category := range categories {
-		if category.ID.Hex() != categoryID {
-			categoryMap[category.ID.Hex()] = true
+		if category.ID != categoryID {
+			categoryMap[category.ID] = true
 		}
 	}
 	for _, feed := range feeds {
